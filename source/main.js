@@ -1,3 +1,9 @@
+const {
+  requestAnimationFrame: rAF,
+  cancelAnimationFrame: cAF,
+  addEventListener: on,
+  removeEventListener: off,
+} = window;
 const { PI: π } = Math;
 
 const cvs = document.getElementById('c');
@@ -44,3 +50,46 @@ function ex(x, y, w, h) {
 }
 
 // ex(0, 0, w, h);
+
+let firstTime = 0,
+  deltaTime = 0,
+  currTime = 0,
+  prevTime = 0;
+
+let frameId = 0;
+function start(cb) {
+  if (frameId) stop();
+
+  function tick(t) {
+    if (!firstTime) {
+      firstTime = t;
+      prevTime = t - firstTime;
+    }
+
+    currTime = t - firstTime;
+    deltaTime = currTime - prevTime;
+
+    cb(currTime, deltaTime);
+
+    prevTime = currTime;
+    frameId = rAF(tick);
+  }
+
+  frameId = rAF(tick);
+}
+
+function stop() {
+  cAF(frameId);
+  frameId = 0;
+}
+
+on('click', () => {
+  frameId === 0
+    ? start((ct, dt) => {
+        console.log(`\
+ct: ${ct}
+dt: ${dt}
+        `);
+      })
+    : stop();
+});
