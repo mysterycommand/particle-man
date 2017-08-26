@@ -6,7 +6,5 @@
   "repository": "https://github.com/mysterycommand/particle-man.git",
   "author": "Matt Hayes <matt@mysterycommand.com> (http://mysterycommand.com/)",
   "license": "MIT",
-  "devDependencies": {
-    "eslint": "^3.19.0"
-  }
+  "devDependencies": {}
 }
