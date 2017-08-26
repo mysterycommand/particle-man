@@ -112,6 +112,51 @@ function draw(t, d) {
   rect(hw + head(t), hh - 6, 1);
 }
 
+function ik() {
+  let angle, theta1, theta2, targetSqrDist;
+
+  // target position
+  const ix = pointer.x - origin.x;
+  const iy = pointer.y - origin.y;
+
+  // target square distance
+  targetSqrDist = ix * ix + iy * iy;
+
+  // first segment
+  angle = Math.max(
+    -1,
+    Math.min(
+      1,
+      (targetSqrDist + segment1.len2 - segment2.len2) /
+        (2 * segment1.len * Math.sqrt(targetSqrDist)),
+    ),
+  );
+
+  theta1 = Math.atan2(iy, ix) - Math.acos(angle);
+
+  segment1.x = origin.x + segment1.len * Math.cos(theta1);
+  segment1.y = origin.y + segment1.len * Math.sin(theta1);
+
+  // second segment
+  angle = Math.max(
+    -1,
+    Math.min(
+      1,
+      (targetSqrDist - segment1.len2 - segment2.len2) / (2 * segment1.len * segment2.len),
+    ),
+  );
+
+  theta2 = Math.acos(angle);
+
+  segment2.x = segment1.x + segment2.len * Math.cos(theta2 + theta1);
+  segment2.y = segment1.y + segment2.len * Math.sin(theta2 + theta1);
+
+  // draw
+  line(origin.x, origin.y, segment1.x, segment1.y, 'navy', 8, 1, 0);
+  line(segment1.x, segment1.y, segment2.x, segment2.y, 'gray', 8, 1, 0);
+  line(origin.x, origin.y, pointer.x, pointer.y, 'red', 4, 2, 2);
+}
+
 on('click', () => {
   frameId === 0 ? play(draw) : pause();
 });
