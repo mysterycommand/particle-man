@@ -4,7 +4,9 @@ const {
   addEventListener: on,
   removeEventListener: off,
 } = window;
-const { PI: π } = Math;
+
+const { PI: π, sin } = Math;
+const ππ = 2 * π;
 
 const cvs = document.getElementById('c');
 const ctx = cvs.getContext('2d');
@@ -19,8 +21,6 @@ ctx.imageSmoothingEnabled = false;
 ctx.fillStyle = 'red';
 ctx.fillRect(0, 0, w, h);
 
-ctx.fillStyle = 'darkred';
-
 function rect(x, y, s, r = 0) {
   ctx.translate(x, y);
   ctx.rotate(r);
@@ -29,7 +29,8 @@ function rect(x, y, s, r = 0) {
 }
 
 function man(x, y) {
-  rect(x + 1, y - 6, 1);
+  ctx.fillStyle = 'darkred';
+  // rect(x + 1, y - 6, 1);
   rect(x, y, 2);
   rect(x - 3, y + 6, 1);
   rect(x + 3, y + 6, 1);
@@ -54,12 +55,10 @@ function ex(x, y, w, h) {
 let firstTime = 0,
   deltaTime = 0,
   currTime = 0,
-  prevTime = 0;
+  prevTime = 0,
+  frameId = 0;
 
-let frameId = 0;
-function start(cb) {
-  if (frameId) stop();
-
+function play(cb) {
   function tick(t) {
     if (!firstTime) {
       firstTime = t;
@@ -78,18 +77,41 @@ function start(cb) {
   frameId = rAF(tick);
 }
 
-function stop() {
+function pause() {
   cAF(frameId);
   frameId = 0;
 }
 
+function getWaveFn(fn, p = 1000, min = -1, max = 1, o = 0) {
+  // peak amplitude (not peak-to-peak amplitude)
+  // @see https://en.wikipedia.org/wiki/Amplitude
+  const amp = (max - min) / 2;
+
+  // radians per period (angular frequency)
+  // @see https://en.wikipedia.org/wiki/Angular_frequency
+  const rpp = ππ / p;
+
+  return ts => {
+    // offset timestamp
+    const ots = o + ts;
+    return amp * (1 + fn(ots * rpp)) + min;
+  };
+}
+
+function getSinFn(p = 1000, min = -1, max = 1, o = 0) {
+  return getWaveFn(sin, p, min, max, o);
+}
+
+const head = getSinFn(2000);
+
+function draw(t, d) {
+  ctx.fillStyle = 'red';
+  ctx.fillRect(0, 0, w, h);
+
+  man(hw, hh);
+  rect(hw + head(t), hh - 6, 1);
+}
+
 on('click', () => {
-  frameId === 0
-    ? start((ct, dt) => {
-        console.log(`\
-ct: ${ct}
-dt: ${dt}
-        `);
-      })
-    : stop();
+  frameId === 0 ? play(draw) : pause();
 });
