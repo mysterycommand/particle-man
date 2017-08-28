@@ -9,7 +9,7 @@ const { PI: π, sin } = Math;
 const ππ = 2 * π;
 
 const cvs = document.getElementById('c') as HTMLCanvasElement;
-const ctx = cvs.getContext('2d');
+const ctx = cvs.getContext('2d') as CanvasRenderingContext2D;
 
 const w = (cvs.width = 160);
 const h = (cvs.height = 90);
@@ -21,14 +21,14 @@ ctx.imageSmoothingEnabled = false;
 ctx.fillStyle = 'red';
 ctx.fillRect(0, 0, w, h);
 
-function rect(x, y, s, r = 0) {
+function rect(x: number, y: number, s: number = 1, r: number = 0) {
   ctx.translate(x, y);
   ctx.rotate(r);
   ctx.fillRect(s * -1, s * -2, s * 2, s * 4);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
-function man(x, y) {
+function man(x: number, y: number) {
   ctx.fillStyle = 'darkred';
   // rect(x + 1, y - 6, 1);
   rect(x, y, 2);
@@ -40,7 +40,7 @@ function man(x, y) {
 
 man(hw, hh);
 
-function ex(x, y, w, h) {
+function ex(x: number, y: number, w: number, h: number) {
   ctx.lineWidth = 1;
   ctx.strokeStyle = 'white';
   ctx.moveTo(x, y);
@@ -58,8 +58,8 @@ let firstTime = 0,
   prevTime = 0,
   frameId = 0;
 
-function play(cb) {
-  function tick(t) {
+function play(cb: Function) {
+  function tick(t: number) {
     if (!firstTime) {
       firstTime = t;
       prevTime = t - firstTime;
@@ -82,7 +82,7 @@ function pause() {
   frameId = 0;
 }
 
-function getWaveFn(fn, p = 1000, min = -1, max = 1, o = 0) {
+function getWaveFn(fn: Function, p = 1000, min = -1, max = 1, o = 0) {
   // peak amplitude (not peak-to-peak amplitude)
   // @see https://en.wikipedia.org/wiki/Amplitude
   const amp = (max - min) / 2;
@@ -91,25 +91,25 @@ function getWaveFn(fn, p = 1000, min = -1, max = 1, o = 0) {
   // @see https://en.wikipedia.org/wiki/Angular_frequency
   const rpp = ππ / p;
 
-  return ts => {
+  return (ts: number) => {
     // offset timestamp
     const ots = o + ts;
     return amp * (1 + fn(ots * rpp)) + min;
   };
 }
 
-function getSinFn(p = 1000, min = -1, max = 1, o = 0) {
+function getSinFn(p: number = 1000, min: number = -1, max: number = 1, o: number = 0) {
   return getWaveFn(sin, p, min, max, o);
 }
 
 const head = getSinFn(2000);
 
-function draw(t, d) {
+function draw(ts: number, dt: number) {
   ctx.fillStyle = 'red';
   ctx.fillRect(0, 0, w, h);
 
   man(hw, hh);
-  rect(hw + head(t), hh - 6, 1);
+  rect(hw + head(ts), hh - 6, 1);
 }
 
 // function ik() {
