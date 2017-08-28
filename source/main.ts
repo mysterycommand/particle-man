@@ -1,3 +1,5 @@
+// import './style.scss';
+
 const {
   requestAnimationFrame: rAF,
   cancelAnimationFrame: cAF,
