@@ -7,15 +7,9 @@
   "author": "Matt Hayes <matt@mysterycommand.com> (http://mysterycommand.com/)",
   "license": "MIT",
   "scripts": {
-    "build": "webpack --config=./config/webpack.config.ts",
-    "start": "webpack --watch --config=./config/webpack.config.ts"
+    "build": "tsc "
   },
   "devDependencies": {
-    "@types/webpack": "^3.0.10",
-    "awesome-typescript-loader": "^3.2.3",
-    "source-map-loader": "^0.2.1",
-    "ts-node": "^3.3.0",
-    "typescript": "^2.4.2",
-    "webpack": "^3.5.5"
+    "typescript": "^2.4.2"
   }
 }
