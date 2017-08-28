@@ -1,4 +1,4 @@
-import { resolve, relative } from 'path';
+import { relative } from 'path';
 
 import { Configuration } from 'webpack';
 
@@ -8,18 +8,18 @@ import * as ForkTsChecker from 'fork-ts-checker-webpack-plugin';
 import * as ExtractText from 'extract-text-webpack-plugin';
 import * as Html from 'html-webpack-plugin';
 
+import {
+  cwd,
+  configPath,
+  sourcePath,
+  buildPath,
+  tsconfigPath,
+  templatePath,
+  entryPath,
+  stylePath,
+} from './paths';
+
 const { extract } = ExtractText;
-
-const rootPath = resolve(__dirname, '../');
-
-const configPath = resolve(rootPath, 'config');
-const sourcePath = resolve(rootPath, 'source');
-const buildPath = resolve(rootPath, 'build');
-
-const tsconfigPath = resolve(configPath, 'tsconfig.json');
-const templatePath = resolve(sourcePath, 'index.ejs');
-const entryPath = resolve(sourcePath, 'main.ts');
-const stylePath = resolve(sourcePath, 'main.scss');
 
 const configuration: Configuration = {
   cache: true,
@@ -46,7 +46,7 @@ const configuration: Configuration = {
             {
               loader: 'css-loader',
               options: {
-                root: rootPath,
+                root: cwd,
                 // sourceMap: true,
               },
             },
@@ -73,7 +73,7 @@ const configuration: Configuration = {
 
   plugins: [
     new BabelMinify(),
-    new Clean([relative(rootPath, buildPath)], { root: rootPath }),
+    new Clean([relative(cwd, buildPath)], { root: cwd }),
     new ExtractText({
       filename: '[name].css',
     }),
