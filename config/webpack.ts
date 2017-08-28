@@ -1,4 +1,4 @@
-import { relative } from 'path';
+import { relative, resolve } from 'path';
 
 import { Configuration } from 'webpack';
 
@@ -21,10 +21,13 @@ const style = resolve(source, 'main.scss');
 
 const { extract } = ExtractText;
 
-process.env.NODE_ENV || (process.env.NODE_ENV = 'production');
+export const PROD = 'production';
+export const DEV = 'development';
+
+process.env.NODE_ENV || (process.env.NODE_ENV = PROD);
 const configuration: Configuration = {
   cache: true,
-  devtool: process.env.NODE_ENV === 'production' ? 'source-map' : '',
+  devtool: process.env.NODE_ENV === PROD ? false : 'inline-source-map',
   entry,
 
   module: {
@@ -47,8 +50,8 @@ const configuration: Configuration = {
             {
               loader: 'css-loader',
               options: {
-                root: cwd,
-                sourceMap: process.env.NODE_ENV !== 'production',
+                root,
+                sourceMap: process.env.NODE_ENV === DEV,
               },
             },
             {
@@ -56,7 +59,7 @@ const configuration: Configuration = {
               options: {
                 outputStyle: 'compressed',
                 precision: 2,
-                sourceMap: process.env.NODE_ENV !== 'production',
+                sourceMap: process.env.NODE_ENV === DEV,
               },
             },
           ],
@@ -72,12 +75,12 @@ const configuration: Configuration = {
   },
 
   plugins: [
-    new Clean([relative(cwd, build)], { root: cwd }),
+    new Clean([relative(root, build)], { root }),
     new ExtractText({
       filename: '[name].css',
     }),
   ].concat(
-    process.env.NODE_ENV === 'production'
+    process.env.NODE_ENV === PROD
       ? [
           new BabelMinify(),
           new Html({
