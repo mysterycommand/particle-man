@@ -1,18 +1,30 @@
-import { resolve } from 'path';
+import { resolve, relative } from 'path';
 
 import { Configuration } from 'webpack';
 
+import * as BabelMinify from 'babel-minify-webpack-plugin';
+import * as Clean from 'clean-webpack-plugin';
 import * as ForkTsChecker from 'fork-ts-checker-webpack-plugin';
 import * as ExtractText from 'extract-text-webpack-plugin';
 import * as Html from 'html-webpack-plugin';
 
 const { extract } = ExtractText;
-const tsconfigPath = resolve(__dirname, 'tsconfig.json');
+
+const rootPath = resolve(__dirname, '../');
+
+const configPath = resolve(rootPath, 'config');
+const sourcePath = resolve(rootPath, 'source');
+const buildPath = resolve(rootPath, 'build');
+
+const tsconfigPath = resolve(configPath, 'tsconfig.json');
+const templatePath = resolve(sourcePath, 'index.ejs');
+const entryPath = resolve(sourcePath, 'main.ts');
+const stylePath = resolve(sourcePath, 'main.scss');
 
 const configuration: Configuration = {
   cache: true,
-  devtool: 'inline-source-map',
-  entry: './source/main.ts',
+  // devtool: 'source-map',
+  entry: entryPath,
 
   module: {
     rules: [
@@ -34,17 +46,17 @@ const configuration: Configuration = {
             {
               loader: 'css-loader',
               options: {
-                root: '.',
-                sourceMap: true,
+                root: rootPath,
+                // sourceMap: true,
               },
             },
             {
               loader: 'sass-loader',
               options: {
-                outputStyle: 'expanded',
-                precision: 9,
-                sourceComments: true,
-                sourceMap: true,
+                outputStyle: 'compressed',
+                precision: 2,
+                // sourceComments: true,
+                // sourceMap: true,
               },
             },
           ],
@@ -54,16 +66,20 @@ const configuration: Configuration = {
   },
 
   output: {
-    filename: '[name].[hash].js',
-    path: resolve(__dirname, '../build'),
+    filename: '[name].js',
+    path: buildPath,
     publicPath: '',
   },
 
   plugins: [
+    new BabelMinify(),
+    new Clean([relative(rootPath, buildPath)], { root: rootPath }),
+    new ExtractText({
+      filename: '[name].css',
+    }),
     new ForkTsChecker({ tsconfig: tsconfigPath }),
-    new ExtractText('main.css'),
     new Html({
-      template: 'source/index.ejs',
+      template: templatePath,
       minify: {
         removeComments: true,
         collapseWhitespace: true,
