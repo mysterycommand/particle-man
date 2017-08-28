@@ -8,23 +8,24 @@ import * as ForkTsChecker from 'fork-ts-checker-webpack-plugin';
 import * as ExtractText from 'extract-text-webpack-plugin';
 import * as Html from 'html-webpack-plugin';
 
-import {
-  cwd,
-  configPath,
-  sourcePath,
-  buildPath,
-  tsconfigPath,
-  templatePath,
-  entryPath,
-  stylePath,
-} from './paths';
+const root = process.cwd();
+
+const config = resolve(root, 'config');
+const source = resolve(root, 'source');
+const build = resolve(root, 'build');
+
+const tsconfig = resolve(config, 'tsconfig.json');
+const template = resolve(source, 'index.ejs');
+const entry = resolve(source, 'main.ts');
+const style = resolve(source, 'main.scss');
 
 const { extract } = ExtractText;
 
+process.env.NODE_ENV || (process.env.NODE_ENV = 'production');
 const configuration: Configuration = {
   cache: true,
-  // devtool: 'source-map',
-  entry: entryPath,
+  devtool: process.env.NODE_ENV === 'production' ? 'source-map' : '',
+  entry,
 
   module: {
     rules: [
@@ -33,7 +34,7 @@ const configuration: Configuration = {
         exclude: /node_modules/,
         loader: 'ts-loader',
         options: {
-          configFile: tsconfigPath,
+          configFile: tsconfig,
           transpileOnly: true,
         },
       },
@@ -47,7 +48,7 @@ const configuration: Configuration = {
               loader: 'css-loader',
               options: {
                 root: cwd,
-                // sourceMap: true,
+                sourceMap: process.env.NODE_ENV !== 'production',
               },
             },
             {
@@ -55,8 +56,7 @@ const configuration: Configuration = {
               options: {
                 outputStyle: 'compressed',
                 precision: 2,
-                // sourceComments: true,
-                // sourceMap: true,
+                sourceMap: process.env.NODE_ENV !== 'production',
               },
             },
           ],
@@ -67,30 +67,34 @@ const configuration: Configuration = {
 
   output: {
     filename: '[name].js',
-    path: buildPath,
+    path: build,
     publicPath: '',
   },
 
   plugins: [
-    new BabelMinify(),
-    new Clean([relative(cwd, buildPath)], { root: cwd }),
+    new Clean([relative(cwd, build)], { root: cwd }),
     new ExtractText({
       filename: '[name].css',
     }),
-    new ForkTsChecker({ tsconfig: tsconfigPath }),
-    new Html({
-      template: templatePath,
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        conservativeCollapse: true,
-        removeTagWhitespace: true,
-        removeAttributeQuotes: true,
-        removeRedundantAttributes: true,
-        quoteCharacter: '"',
-      },
-    }),
-  ],
+  ].concat(
+    process.env.NODE_ENV === 'production'
+      ? [
+          new BabelMinify(),
+          new Html({
+            template,
+            minify: {
+              removeComments: true,
+              collapseWhitespace: true,
+              conservativeCollapse: true,
+              removeTagWhitespace: true,
+              removeAttributeQuotes: true,
+              removeRedundantAttributes: true,
+              quoteCharacter: '"',
+            },
+          }),
+        ]
+      : [new ForkTsChecker({ tsconfig })],
+  ),
 
   resolve: {
     extensions: ['.ts', '.js'],
