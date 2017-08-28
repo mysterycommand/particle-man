@@ -7,8 +7,7 @@
   "author": "Matt Hayes <matt@mysterycommand.com> (http://mysterycommand.com/)",
   "license": "MIT",
   "scripts": {
-    "build": "webpack --config ./config/webpack.ts",
-    "start": "tsc -w"
+    "build": "webpack --config ./config/webpack/base.ts"
   },
   "devDependencies": {
     "@types/extract-text-webpack-plugin": "^2.1.0",
