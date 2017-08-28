@@ -27,7 +27,16 @@ export const DEV = 'development';
 process.env.NODE_ENV || (process.env.NODE_ENV = PROD);
 const configuration: Configuration = {
   cache: true,
-  devtool: process.env.NODE_ENV === PROD ? false : 'inline-source-map',
+  devtool: process.env.NODE_ENV === PROD ? false : 'eval-source-map',
+  devServer:
+    process.env.NODE_ENV === PROD
+      ? {}
+      : {
+          contentBase: '.',
+          stats: {
+            colors: true,
+          },
+        },
   entry,
 
   module: {
@@ -71,7 +80,7 @@ const configuration: Configuration = {
   output: {
     filename: '[name].js',
     path: build,
-    publicPath: '',
+    publicPath: '.',
   },
 
   plugins: [
