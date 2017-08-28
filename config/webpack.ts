@@ -1,12 +1,13 @@
 import { resolve } from 'path';
 
 import { Configuration } from 'webpack';
+
 import * as ForkTsChecker from 'fork-ts-checker-webpack-plugin';
 import * as ExtractText from 'extract-text-webpack-plugin';
 import * as Html from 'html-webpack-plugin';
 
-const { description } = require('../package');
-const tsconfig = resolve(__dirname, 'tsconfig.json');
+const { extract } = ExtractText;
+const tsconfigPath = resolve(__dirname, 'tsconfig.json');
 
 const configuration: Configuration = {
   cache: true,
@@ -20,9 +21,34 @@ const configuration: Configuration = {
         exclude: /node_modules/,
         loader: 'ts-loader',
         options: {
-          configFile: tsconfig,
+          configFile: tsconfigPath,
           transpileOnly: true,
         },
+      },
+      {
+        test: /\.s?css$/,
+        exclude: /node_modules/,
+        use: extract({
+          fallback: 'style-loader',
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                root: '.',
+                sourceMap: true,
+              },
+            },
+            {
+              loader: 'sass-loader',
+              options: {
+                outputStyle: 'expanded',
+                precision: 9,
+                sourceComments: true,
+                sourceMap: true,
+              },
+            },
+          ],
+        }),
       },
     ],
   },
@@ -34,12 +60,24 @@ const configuration: Configuration = {
   },
 
   plugins: [
-    new ForkTsChecker({ tsconfig }),
+    new ForkTsChecker({ tsconfig: tsconfigPath }),
     new ExtractText('main.css'),
-    new Html({ template: 'source/index.ejs' }),
+    new Html({
+      template: 'source/index.ejs',
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        conservativeCollapse: true,
+        removeTagWhitespace: true,
+        removeAttributeQuotes: true,
+        removeRedundantAttributes: true,
+        quoteCharacter: '"',
+      },
+    }),
   ],
+
   resolve: {
-    extensions: ['ts'],
+    extensions: ['.ts', '.js'],
   },
 };
 

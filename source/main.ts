@@ -1,4 +1,4 @@
-// import './style.scss';
+import './main.scss';
 
 const {
   requestAnimationFrame: rAF,
