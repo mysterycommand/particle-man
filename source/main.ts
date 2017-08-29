@@ -28,8 +28,6 @@ const hh: number = h / 2;
 const field: IField = new Field();
 
 ctx.imageSmoothingEnabled = false;
-ctx.fillStyle = 'red';
-ctx.fillRect(0, 0, w, h);
 
 let firstTime: number = 0;
 let deltaTime: number = 0;
@@ -38,6 +36,8 @@ let currTime: number = 0;
 let prevTime: number = 0;
 
 let frameId: number = 0;
+
+function init(): void {}
 
 function play(cb: (ts: number, dt: number) => void): void {
   function tick(t: number) {
@@ -63,13 +63,41 @@ function pause(): void {
   frameId = 0;
 }
 
-function draw(ts: number, dt: number): void {
-  ctx.fillStyle = 'red';
-  ctx.fillRect(0, 0, w, h);
+function draw(ts: number = 0, dt: number = 0): void {
+  ctx.clearRect(0, 0, w, h);
+
+  field.particles.forEach(({ pos: { x, y } }) => {
+    ctx.fillStyle = `hsl(${x / w * 360},${(1 - y / h) * 100}%,50%)`;
+    ctx.fillRect(x - 4.5, y - 4.5, 9, 9);
+  });
 }
 
+play(draw);
+
+let col: number = 0;
+let row: number = 0;
+const cellSize: number = 10;
+const halfCellSize: number = cellSize / 2;
+
 on('click', () => {
-  frameId === 0 ? play(draw) : pause();
-  field.particles.push(new Particle());
-  console.log(field.particles);
+  // frameId === 0 ? play(draw) : pause();
+  while (row < h / cellSize - 1) {
+    field.particles.push(
+      new Particle({
+        pos: new Vector({
+          x: halfCellSize + col * cellSize,
+          y: halfCellSize + row * cellSize,
+        }),
+      }),
+    );
+
+    col += 1;
+    if (col > w / cellSize - 1) {
+      col = 0;
+      row += 1;
+    }
+  }
+
+  console.log(col, row);
+  // console.log(JSON.stringify(field, null, 2));
 });
