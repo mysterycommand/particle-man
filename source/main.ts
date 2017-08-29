@@ -1,3 +1,7 @@
+import Vector, { IVector } from './lib/vector';
+import Particle, { IParticle } from './lib/particle';
+import Field, { IField } from './lib/field';
+
 import './main.scss';
 
 const { NODE_ENV } = process.env;
@@ -13,13 +17,15 @@ const { PI: π, sin } = Math;
 const ππ = 2 * π;
 
 const cvs: HTMLCanvasElement = document.getElementById('c') as HTMLCanvasElement;
-const ctx: CanvasRenderingContext2D = cvs.getContext('2d');
+const ctx: CanvasRenderingContext2D = cvs.getContext('2d') as CanvasRenderingContext2D;
 
 const w: number = (cvs.width = 160);
 const h: number = (cvs.height = 90);
 
 const hw: number = w / 2;
 const hh: number = h / 2;
+
+const field: IField = new Field();
 
 ctx.imageSmoothingEnabled = false;
 ctx.fillStyle = 'red';
@@ -64,4 +70,6 @@ function draw(ts: number, dt: number): void {
 
 on('click', () => {
   frameId === 0 ? play(draw) : pause();
+  field.particles.push(new Particle());
+  console.log(field.particles);
 });
