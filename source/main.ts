@@ -12,26 +12,28 @@ const {
 const { PI: π, sin } = Math;
 const ππ = 2 * π;
 
-const cvs = document.getElementById('c') as HTMLCanvasElement;
-const ctx = cvs.getContext('2d') as CanvasRenderingContext2D;
+const cvs: HTMLCanvasElement = document.getElementById('c') as HTMLCanvasElement;
+const ctx: CanvasRenderingContext2D = cvs.getContext('2d');
 
-const w = (cvs.width = 160);
-const h = (cvs.height = 90);
+const w: number = (cvs.width = 160);
+const h: number = (cvs.height = 90);
 
-const hw = w / 2;
-const hh = h / 2;
+const hw: number = w / 2;
+const hh: number = h / 2;
 
 ctx.imageSmoothingEnabled = false;
 ctx.fillStyle = 'red';
 ctx.fillRect(0, 0, w, h);
 
-let firstTime = 0,
-  deltaTime = 0,
-  currTime = 0,
-  prevTime = 0,
-  frameId = 0;
+let firstTime: number = 0;
+let deltaTime: number = 0;
 
-function play(cb: Function) {
+let currTime: number = 0;
+let prevTime: number = 0;
+
+let frameId: number = 0;
+
+function play(cb: (ts: number, dt: number) => void): void {
   function tick(t: number) {
     if (!firstTime) {
       firstTime = t;
@@ -50,12 +52,12 @@ function play(cb: Function) {
   frameId = rAF(tick);
 }
 
-function pause() {
+function pause(): void {
   cAF(frameId);
   frameId = 0;
 }
 
-function draw(ts: number, dt: number) {
+function draw(ts: number, dt: number): void {
   ctx.fillStyle = 'red';
   ctx.fillRect(0, 0, w, h);
 }
