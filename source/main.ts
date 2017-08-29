@@ -1,5 +1,7 @@
 import './main.scss';
 
+const { NODE_ENV } = process.env;
+
 const {
   requestAnimationFrame: rAF,
   cancelAnimationFrame: cAF,

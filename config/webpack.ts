@@ -1,6 +1,6 @@
 import { relative, resolve } from 'path';
 
-import { Configuration } from 'webpack';
+import { Configuration, EnvironmentPlugin } from 'webpack';
 
 import * as BabelMinify from 'babel-minify-webpack-plugin';
 import * as Clean from 'clean-webpack-plugin';
@@ -83,6 +83,7 @@ const configuration: Configuration = {
 
   plugins: [
     new Clean([relative(root, build)], { root }),
+    new EnvironmentPlugin(['NODE_ENV']),
     new ExtractText({
       filename: '[name].css',
     }),
