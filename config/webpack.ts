@@ -7,6 +7,7 @@ import * as Clean from 'clean-webpack-plugin';
 import * as ForkTsChecker from 'fork-ts-checker-webpack-plugin';
 import * as ExtractText from 'extract-text-webpack-plugin';
 import * as Html from 'html-webpack-plugin';
+import * as Disk from 'html-webpack-harddisk-plugin';
 
 const root = process.cwd();
 
@@ -32,10 +33,8 @@ const configuration: Configuration = {
     process.env.NODE_ENV === PROD
       ? {}
       : {
-          contentBase: '.',
-          stats: {
-            colors: true,
-          },
+          contentBase: build,
+          port: 3000,
         },
   entry,
 
@@ -80,7 +79,6 @@ const configuration: Configuration = {
   output: {
     filename: '[name].js',
     path: build,
-    publicPath: '.',
   },
 
   plugins: [
@@ -104,8 +102,16 @@ const configuration: Configuration = {
               quoteCharacter: '"',
             },
           }),
+          new Disk(),
         ]
-      : [new ForkTsChecker({ tsconfig })],
+      : [
+          new ForkTsChecker({ tsconfig }),
+          new Html({
+            alwaysWriteToDisk: true,
+            template,
+          }),
+          new Disk(),
+        ],
   ),
 
   resolve: {
