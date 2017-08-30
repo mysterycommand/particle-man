@@ -37,7 +37,32 @@ let prevTime: number = 0;
 
 let frameId: number = 0;
 
-function init(): void {}
+const cellSize: number = 10;
+const halfCellSize: number = cellSize / 2;
+
+function init(): void {
+  let col: number = 0;
+  let row: number = 0;
+
+  while (row < h / cellSize - 1) {
+    field.particles.push(
+      new Particle({
+        pos: new Vector({
+          x: halfCellSize + col * cellSize,
+          y: halfCellSize + row * cellSize,
+        }),
+      }),
+    );
+
+    col += 1;
+    if (col > w / cellSize - 1) {
+      col = 0;
+      row += 1;
+    }
+  }
+
+  draw();
+}
 
 function play(cb: (ts: number, dt: number) => void): void {
   function tick(t: number) {
@@ -72,32 +97,10 @@ function draw(ts: number = 0, dt: number = 0): void {
   });
 }
 
-play(draw);
-
-let col: number = 0;
-let row: number = 0;
-const cellSize: number = 10;
-const halfCellSize: number = cellSize / 2;
+// play(draw);
+init();
 
 on('click', () => {
   // frameId === 0 ? play(draw) : pause();
-  while (row < h / cellSize - 1) {
-    field.particles.push(
-      new Particle({
-        pos: new Vector({
-          x: halfCellSize + col * cellSize,
-          y: halfCellSize + row * cellSize,
-        }),
-      }),
-    );
-
-    col += 1;
-    if (col > w / cellSize - 1) {
-      col = 0;
-      row += 1;
-    }
-  }
-
-  console.log(col, row);
   // console.log(JSON.stringify(field, null, 2));
 });
